@@ -14,5 +14,37 @@
 
    <p>A Meaningful Messaging Bot</p></p>
 
+  <h3>Order Lookup (testing code)</h3>
+
+  <input type="text" id="orderInput" placeholder="Enter order number">
+  <button onclick="lookupOrder()">Submit</button>
+
+  <p id="result"></p>
+
+  <script>
+    const data = [
+      { order_number: "1001", name: "John Doe", date_received: "2026-03-25", status: "pending" },
+      { order_number: "1002", name: "Jane Smith", date_received: "2026-03-26", status: "shipped" },
+      { order_number: "1003", name: "Alex Carter", date_received: "2026-03-27", status: "delivered" },
+      { order_number: "1004", name: "Taylor Brooks", date_received: "2026-03-28", status: "pending" },
+      { order_number: "1005", name: "Jordan Lee", date_received: "2026-03-29", status: "shipped" }
+    ];
+
+    function lookupOrder() {
+      const input = document.getElementById("orderInput").value;
+
+      const result = data.find(item => item.order_number === input);
+
+      if (result) {
+        document.getElementById("result").innerText =
+          "Name: " + result.name +
+          " | Date: " + result.date_received +
+          " | Status: " + result.status;
+      } else {
+        document.getElementById("result").innerText = "Order not found";
+      }
+    }
+  </script>
+
 </body>
 </html>
