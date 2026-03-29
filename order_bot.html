@@ -8,34 +8,43 @@
 <!-- END LivePerson Monitor. -->
 
   <!-- mock order lookup test script -->
-  <script>
- const data = [
-      { order_number: "1001", name: "John Doe", product: "Glow-in-the-Dark Balloons", date_received: "2026-03-25", status: "pending" },
-      { order_number: "1002", name: "Jane Smith", product: "Giant Inflatable Unicorn", date_received: "2026-03-26", status: "shipped" },
-      { order_number: "1003", name: "Alex Carter", product: "Confetti Cannon Deluxe", date_received: "2026-03-27", status: "delivered" },
-      { order_number: "1004", name: "Taylor Brooks", product: "Disco Ball Party Kit", date_received: "2026-03-28", status: "pending" },
-      { order_number: "1005", name: "Jordan Lee", product: "LED Light-Up Drink Cups", date_received: "2026-03-29", status: "shipped" }
+   <script>
+    const data = [
+      { "order_number": "1001", "name": "John Doe", "product": "Glow-in-the-Dark Balloons", "date_received": "2026-03-25", "status": "pending" },
+      { "order_number": "1002", "name": "Jane Smith", "product": "Giant Inflatable Unicorn", "date_received": "2026-03-26", "status": "shipped" },
+      { "order_number": "1003", "name": "Alex Carter", "product": "Confetti Cannon Deluxe", "date_received": "2026-03-27", "status": "delivered" },
+      { "order_number": "1004", "name": "Taylor Brooks", "product": "Disco Ball Party Kit", "date_received": "2026-03-28", "status": "pending" },
+      { "order_number": "1005", "name": "Jordan Lee", "product": "LED Light-Up Drink Cups", "date_received": "2026-03-29", "status": "shipped" }
     ];
 
-  function lookupOrder() {
-    const input = document.getElementById("orderInput").value.trim();
+    function lookupOrder() {
+      const order_number = document.getElementById("orderInput").value.trim();
 
-    const result = data.find(item => item.order_number === input);
+      const result = data.find(item => item.order_number === order_number);
 
-    console.log("INPUT:", input);
-    console.log("DATA:", data);
+      let name, product, orderDate, status;
 
-   if (result) {
-    document.getElementById("result").innerHTML =
-      "Name: " + result.name + "<br>" +
-      "Product: " + result.product + "<br>" +
-      "Order Date: " + result.date_received + "<br>" +
-      "Status: " + result.status + "<br><br>";
-  } else {
-    document.getElementById("result").innerText = "Order not found";
+      if (!result) {
+        name = "NOT FOUND";
+        product = "NOT FOUND";
+        orderDate = null;
+        status = "NOT FOUND";
+      } else {
+        name = result.name;
+        product = result.product;
+        orderDate = result.date_received;
+        status = result.status;
+      }
+
+      // Display in HTML
+      document.getElementById("result").innerHTML =
+        "Order #: " + order_number + "<br><br>" +
+        "Name: " + name + "<br>" +
+        "Product: " + product + "<br>" +
+        "Order Date: " + (orderDate || "N/A") + "<br>" +
+        "Status: " + status;
     }
-  }
-</script>
+  </script>
   <!-- end order test -->
   
 </head>
