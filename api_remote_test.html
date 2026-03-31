@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LP OAuth Test</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/oauth-1.0a/2.2.6/oauth-1.0a.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</head>
+<body>
+
+<button onclick="callLP()">Call LivePerson API</button>
+
+<pre id="output"></pre>
+
+<script>
+const consumerKey = "YOUR_CONSUMER_KEY";
+const consumerSecret = "YOUR_CONSUMER_SECRET";
+const accessToken = "YOUR_ACCESS_TOKEN";
+const tokenSecret = "YOUR_TOKEN_SECRET";
+
+const url = "https://va.msghist.liveperson.net/messaging_history/api/account/33668046/conversations/search";
+
+function callLP() {
+  const body = {
+    start: {
+      from: Date.now() - (4 * 60 * 60 * 1000),
+      to: Date.now()
+    }
+  };
+
+  // OAuth setup
+  const oauth = OAuth({
+    consumer: { key: consumerKey, secret: consumerSecret },
+    signature_method: "HMAC-SHA1",
+    hash_function(base_string, key) {
+      return CryptoJS.HmacSHA1(base_string, key).toString(CryptoJS.enc.Base64);
+    }
+  });
+
+  const token = {
+    key: accessToken,
+    secret: tokenSecret
+  };
+
+  const requestData = {
+    url: url,
+    method: "POST"
+  };
+
+  const authHeader = oauth.toHeader(oauth.authorize(requestData, token));
+
+  fetch(url, {
+    method: "POST",
+    headers: {
+      ...authHeader,
+      "Content-Type": "application/json",
+      "Source": "Research"
+    },
+    body: JSON.stringify(body)
+  })
+  .then(res => res.json())
+  .then(data => {
+    // Raw output
+    document.getElementById("output").textContent = JSON.stringify(data, null, 2);
+
+    // Parsed results
+    const conversations = data.conversationHistoryRecords || [];
+
+    console.log("Total conversations:", conversations.length);
+
+    conversations.forEach(c => {
+      console.log("Conversation:", {
+        id: c.info?.conversationId,
+        start: c.info?.startTime,
+        end: c.info?.endTime
+      });
+    });
+  })
+  .catch(err => {
+    document.getElementById("output").textContent = "ERROR: " + err;
+    console.error(err);
+  });
+}
+</script>
+
+</body>
+</html>
