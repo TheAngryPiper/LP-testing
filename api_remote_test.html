@@ -2,24 +2,31 @@
 <html>
 <head>
   <title>LP OAuth Test</title>
+
+  <!-- OAuth + Crypto -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/oauth-1.0a/2.2.6/oauth-1.0a.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
 </head>
+
 <body>
 
 <button onclick="callLP()">Call LivePerson API</button>
 
-<pre id="output"></pre>
+<h3>Output:</h3>
+<pre id="output">Click the button...</pre>
 
 <script>
-const consumerKey = "YOUR_CONSUMER_KEY";
-const consumerSecret = "YOUR_CONSUMER_SECRET";
-const accessToken = "YOUR_ACCESS_TOKEN";
-const tokenSecret = "YOUR_TOKEN_SECRET";
-
-const url = "https://va.msghist.liveperson.net/messaging_history/api/account/33668046/conversations/search";
-
 function callLP() {
+
+  // 🔐 YOUR CREDENTIALS
+  const consumerKey = "YOUR_CONSUMER_KEY";
+  const consumerSecret = "YOUR_CONSUMER_SECRET";
+  const accessToken = "YOUR_ACCESS_TOKEN";
+  const tokenSecret = "YOUR_TOKEN_SECRET";
+
+  const url = "https://va.msghist.liveperson.net/messaging_history/api/account/33668046/conversations/search";
+
+  // 📦 Request body
   const body = {
     start: {
       from: Date.now() - (4 * 60 * 60 * 1000),
@@ -27,7 +34,7 @@ function callLP() {
     }
   };
 
-  // OAuth setup
+  // 🧠 OAuth setup
   const oauth = OAuth({
     consumer: { key: consumerKey, secret: consumerSecret },
     signature_method: "HMAC-SHA1",
@@ -46,8 +53,12 @@ function callLP() {
     method: "POST"
   };
 
+  // 🔑 Generate auth header
   const authHeader = oauth.toHeader(oauth.authorize(requestData, token));
 
+  console.log("Auth Header:", authHeader);
+
+  // 🚀 API call
   fetch(url, {
     method: "POST",
     headers: {
@@ -57,27 +68,34 @@ function callLP() {
     },
     body: JSON.stringify(body)
   })
-  .then(res => res.json())
+  .then(res => {
+    console.log("Status:", res.status);
+    return res.json();
+  })
   .then(data => {
-    // Raw output
-    document.getElementById("output").textContent = JSON.stringify(data, null, 2);
 
-    // Parsed results
+    // 🖥️ Show raw response
+    document.getElementById("output").textContent =
+      JSON.stringify(data, null, 2);
+
+    // 🎯 Parse useful info
     const conversations = data.conversationHistoryRecords || [];
 
     console.log("Total conversations:", conversations.length);
 
     conversations.forEach(c => {
-      console.log("Conversation:", {
+      console.log({
         id: c.info?.conversationId,
         start: c.info?.startTime,
         end: c.info?.endTime
       });
     });
+
   })
   .catch(err => {
-    document.getElementById("output").textContent = "ERROR: " + err;
-    console.error(err);
+    console.error("ERROR:", err);
+    document.getElementById("output").textContent =
+      "ERROR: " + err;
   });
 }
 </script>
