@@ -64,8 +64,7 @@ function callLP() {
     method: "POST",
     headers: {
       ...authHeader,
-      "Content-Type": "application/json",
-      "Source": "Research"
+      "Content-Type": "application/json"
     },
     body: JSON.stringify(body)
   })
