@@ -15,16 +15,16 @@
  <h1>LivePerson Solutions Engineering Task</h1>
  <div style="width: 49%; float: right; background-color: #ccffcc; padding: 12px 30px; border: 2px solid black; height: 380px">
     <h2>Reflecting on this Project</h2>
-    <p>Just like riding a bike, the basic were still nearly automatic: campaign/engagemnt, CB flows and integrations, agent, skill and bot setup</p>
+    <p>Just like riding a bike, the basic were still nearly automatic: campaign/engagemnt, CB flows and integrations, agent, skill and bot setup. I resisted the urge to design a fancy engagement button and just stuck with the default.</p>
     <p>Also FaaS is still resonant and didn't give me any real problems from the setup, coding, testing or deployment. It did however take me a few iterations to get the back and forth with the CB integration flowing correctly. Mostly was an issue with passing the data, and you can see I created a secondary function to test this and learn. In the end, like most things, I was overcomplicating it, but its in the skill set now.</p>
-    <p>The stand alone API integration was fun. In the time since my first tenure at LP, I have done a lot of work in this area. What I delivered in this project, for the sake of time, is pretty basic. I could make this much prettier and interactive with time.</p>
-  <p>I will admit also that I did cut a corner with Auth keys and put them directly in code to save time. In a real setting these woule be called from a secure location. </p>
+    <p>The stand alone API integration was fun. In the time since my first tenure at LP, I have done a lot of work in this area. What I delivered in this project, for the sake of time, is pretty basic. I could make this much prettier and interactive with time. I did cut a corner with Auth keys and put them directly in code to save time. In a real setting these woule be called from a secure location. </p>
+   
   </div>
   <div style="width: 49%; background-color: #ffd9b3; padding: 12px 30px; border: 2px solid black; height: 380px">
    <h2>A Meaningful Messaging Bot</h2>
   <p>This is a simple bot for a party supplies store. It has two functions: look up a customer's order and ask general questions.</p>
   <p>The order lookup ask for a four digit order number then returns customer name, product ordered and status of order (shipped, pending, etc). For the purposes of this demo, there is mock data for order number using the numbers 1001-1005.</p>
-  <p>The actual lookup in the bot is done with a FaaS integration that passes the order number provided as a bot variable. The FaaS fucntion contains mock Json data to emulate an API lookup, and it matches the order number provided or returns an order not found message. It then formats the Json data into a readable string and sends it back to the bot.</p>
+  <p>The actual lookup in the bot is done with a FaaS integration that passes the order number provided as a bot variable. The FaaS function contains mock Json data to emulate an API lookup, and it matches the order number provided or returns an order not found message. It then formats the Json data into a readable string and sends it back to the bot.</p>
   <p>The second function of the bot is to answer questions. For simplicity, this version just provides literal questions to three different topics with an inline bot flow. In reality this would likely be an intent based KB or LLM task.</p>  
  </div>
   
