@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>LP OAuth Test</title>
+
+  <!-- OAuth + Crypto -->
+  <script src="https://unpkg.com/oauth-1.0a@2.2.6/oauth-1.0a.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+</head>
+
+<body>
+
+<button onclick="callLP()">Call LivePerson API</button>
+
+<h3>Output FINAL:</h3>
+<div id="output">Click the button...</div>
+
+<script>
+function callLP() {
+
+  // 🔐 YOUR CREDENTIALS
+  const consumerKey = "84b5865e034c4e7188937107938bd386";
+  const consumerSecret = "77188fea5eb6bb83";
+  const accessToken = "15e13c7997e2448087577777973337f9";
+  const tokenSecret = "422794d81d748307";
+
+  const url = "https://va.msghist.liveperson.net/messaging_history/api/account/33668046/conversations/search";
+
+  // 📦 Last 24 hours
+  const body = {
+    start: {
+      from: Date.now() - (24 * 60 * 60 * 1000),
+      to: Date.now()
+    }
+  };
+
+  // 🧠 OAuth setup
+  const oauth = OAuth({
+    consumer: { key: consumerKey, secret: consumerSecret },
+    signature_method: "HMAC-SHA1",
+    hash_function(base_string, key) {
+      return CryptoJS.HmacSHA1(base_string, key).toString(CryptoJS.enc.Base64);
+    }
+  });
+
+  const token = {
+    key: accessToken,
+    secret: tokenSecret
+  };
+
+  const requestData = {
+    url: url,
+    method: "POST"
+  };
+
+  const authHeader = oauth.toHeader(oauth.authorize(requestData, token));
+
+  console.log("Auth Header:", authHeader);
+
+  // 🚀 API call
+  fetch(url, {
+    method: "POST",
+    headers: {
+      ...authHeader,
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(body)
+  })
+  .then(res => {
+    console.log("Status:", res.status);
+    return res.json();
+  })
+  .then(data => {
+
+    const conversations = data.conversationHistoryRecords || [];
+
+    // Sort newest first
+    conversations.sort((a, b) =>
+      new Date(b.info.startTime) - new Date(a.info.startTime)
+    );
+
+    // Build table
+    let table = `
+    <table border="1" cellpadding="6" cellspacing="0">
+      <thead>
+        <tr>
+          <th>ConversationId</th>
+          <th>Start</th>
+          <th>End</th>
+          <th>Duration</th>
+          <th>Agent</th>
+        </tr>
+      </thead>
+      <tbody>
+    `;
+
+    conversations.forEach(c => {
+      const info = c.info || {};
+
+      const id = info.conversationId || "N/A";
+
+      const start = info.startTime
+        ? new Date(info.startTime).toLocaleString()
+        : "N/A";
+
+      const end = info.endTime
+        ? new Date(info.endTime).toLocaleString()
+        : "N/A";
+
+      const durationMs = info.duration || 0;
+      const minutes = Math.floor(durationMs / 60000);
+      const hours = Math.floor(minutes / 60);
+      const remainingMin = minutes % 60;
+
+      const durationStr =
+        hours > 0 ? `${hours}h ${remainingMin}m` : `${minutes}m`;
+
+      const agent = info.latestAgentFullName || "No Agent";
+
+      table += `
+        <tr>
+          <td>${id}</td>
+          <td>${start}</td>
+          <td>${end}</td>
+          <td>${durationStr}</td>
+          <td>${agent}</td>
+        </tr>
+      `;
+    });
+
+    table += `
+      </tbody>
+    </table>
+    `;
+
+    document.getElementById("output").innerHTML = `
+      <div><strong>Total Conversations:</strong> ${conversations.length}</div><br/>
+      ${table}
+    `;
+
+    console.log("Full response:", data);
+
+  })
+  .catch(err => {
+    console.error("ERROR:", err);
+    document.getElementById("output").textContent =
+      "ERROR: " + err;
+  });
+}
+</script>
+
+</body>
+</html>
