@@ -13,7 +13,7 @@
 
 <button onclick="callLP()">Call LivePerson API</button>
 
-<h3>Output v4:</h3>
+<h3>Output v5:</h3>
 <pre id="output">Click the button...</pre>
 
 <script>
@@ -28,12 +28,12 @@ function callLP() {
   const url = "https://va.msghist.liveperson.net/messaging_history/api/account/33668046/conversations/search";
 
   // 📦 Request body
-  const body = {
-    start: {
-      from: Date.now() - (4 * 60 * 60 * 1000),
-      to: Date.now()
-    }
-  };
+ const body = {
+  start: {
+    from: 1774893600000,
+    to: 1774922400000
+  }
+};
 
   // 🧠 OAuth setup
   const oauth = OAuth({
@@ -74,22 +74,23 @@ function callLP() {
   })
   .then(data => {
 
-    // 🖥️ Show raw response
-    document.getElementById("output").textContent =
-      JSON.stringify(data, null, 2);
+  const conversations = data.conversationHistoryRecords || [];
 
-    // 🎯 Parse useful info
-    const conversations = data.conversationHistoryRecords || [];
+  // Build clean output
+  let output = `Total Conversations: ${conversations.length}\n\n`;
 
-    console.log("Total conversations:", conversations.length);
+  conversations.forEach((c, index) => {
+    const id = c.info?.conversationId || "N/A";
+    output += `${index + 1}. ${id}\n`;
+  });
 
-    conversations.forEach(c => {
-      console.log({
-        id: c.info?.conversationId,
-        start: c.info?.startTime,
-        end: c.info?.endTime
-      });
-    });
+  // Show on page
+  document.getElementById("output").textContent = output;
+
+  // Also log full data if needed
+  console.log("Full response:", data);
+
+})
 
   })
   .catch(err => {
